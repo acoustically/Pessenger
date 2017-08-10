@@ -7,13 +7,15 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.provider.Telephony;
 import android.telephony.SmsMessage;
-import android.widget.Toast;
+import android.telephony.TelephonyManager;
+import android.util.Log;
+import org.json.JSONObject;
 
 public class ReceiveSmsService extends Service {
-  String mServerUrl = "http://localhost:80";
+  String mServerIp = "http://localhost:80";
   public ReceiveSmsService() {
-
   }
 
   @Override
@@ -35,21 +37,38 @@ public class ReceiveSmsService extends Service {
       @Override
       public void onReceive(Context context, Intent intent) {
         if ("android.provider.Telephony.SMS_RECEIVED".equals(intent.getAction())) {
-          Bundle bundle = intent.getExtras();
-          Object messages[] = (Object[])bundle.get("pdus");
-          SmsMessage smsMessage[] = new SmsMessage[messages.length];
-
-          for(int i = 0; i < messages.length; i++) {
-            smsMessage[i] = SmsMessage.createFromPdu((byte[])messages[i]);
+          try {
+            String xmlData = buildJson(getSmsMessage(intent), getPhoneNumber());
+            //sendSmsMessageToServer(xmlData);
+          } catch (Exception e) {
+            Log.e("error", "fail to build json");
           }
-          sendSmsMessageToServer(smsMessage[0]);
-          Toast.makeText(context, smsMessage[0].getMessageBody().toString(), Toast.LENGTH_LONG).show();
         }
       }
     }, intentFilter);
   }
-  private void sendSmsMessageToServer(SmsMessage smsMessage) {
-    HttpRequestThread httpRequestThread = new HttpRequestThread(mServerUrl, smsMessage);
-    httpRequestThread.start();
+  private void sendSmsMessageToServer(String xmlData) {
+    ServerWriteThread serverWriteThread = new ServerWriteThread(mServerIp, xmlData);
+    serverWriteThread.start();
+  }
+  private String buildJson(SmsMessage smsMessage, String phoneNumber) throws Exception{
+    JSONObject json = new JSONObject();
+    json.put("sms-receiver-phone-number", phoneNumber);
+    json.put("sms-sender-phone-number", smsMessage.getOriginatingAddress());
+    json.put("sms-body", smsMessage.getMessageBody());
+    return json.toString();
+  }
+  private String getPhoneNumber() {
+    TelephonyManager telephonyManager = (TelephonyManager)this.getSystemService(Context.TELEPHONY_SERVICE);
+    return telephonyManager.getLine1Number();
+  }
+  private SmsMessage getSmsMessage(Intent intent) {
+    Bundle bundle = intent.getExtras();
+    Object messages[] = (Object[])bundle.get("pdus");
+    SmsMessage smsMessage[] = new SmsMessage[messages.length];
+    for(int i = 0; i < messages.length; i++) {
+      smsMessage[i] = SmsMessage.createFromPdu((byte[])messages[i]);
+    }
+    return smsMessage[0];
   }
 }
