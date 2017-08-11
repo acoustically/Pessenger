@@ -21,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
     getPermission(Manifest.permission.RECEIVE_SMS);
+    getPermission(Manifest.permission.READ_PHONE_STATE);
     startService(new Intent(this, ReceiveSmsService.class));
   }
   private void getPermission(String permission) {

@@ -4,6 +4,7 @@ package acoustically.pessenger;
 import android.util.Log;
 
 import java.io.BufferedWriter;
+import java.io.DataOutputStream;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 
@@ -16,7 +17,7 @@ public class ServerWriteThread extends Thread {
   int mServerPort;
   String mJsonData;
   Socket mSocket;
-  BufferedWriter mSocketWriter;
+  DataOutputStream mSocketWriter;
 
   public ServerWriteThread(String jsonData) {
     this.mServerIp = "52.79.104.209";
@@ -28,28 +29,30 @@ public class ServerWriteThread extends Thread {
   public void run() {
     super.run();
     int count = 0;
-    while(!setSocket() || count < 10) {
+    while(!setSocket() && count < 10) {
       count ++;
     }
     if(count >= 10) {
-      Log.e("error", "Fail to socket create");
+      Log.e("error", "error what create socket");
       return;
-    } else if(mSocket.isConnected()) {
+    }
+    if(mSocket.isConnected()) {
+      Log.e("success", "Success to Creating socket");
       try {
-        mSocketWriter.write(mJsonData);
+        mSocketWriter.writeUTF(mJsonData);
+        Log.e("success", "Success to Writting to socket");
       } catch (Exception e) {
-        Log.e("error", "Fail to write to socket");
+        Log.e("error", "Fail to writting to socket");
       }
-    } else {
-
     }
   }
   private boolean setSocket() {
     try {
+      Log.e("error", "try to socket connect");
       mSocket = new Socket(mServerIp, mServerPort);
-      mSocketWriter = new BufferedWriter(new OutputStreamWriter(mSocket.getOutputStream(), "UTF8"));
+      mSocketWriter = new DataOutputStream(mSocket.getOutputStream());
     } catch (Exception e) {
-      Log.e("error", "fail to create socket");
+      Log.e("error", "fail to creating socket");
       return false;
     }
     return true;
