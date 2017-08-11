@@ -14,7 +14,6 @@ import android.util.Log;
 import org.json.JSONObject;
 
 public class ReceiveSmsService extends Service {
-  String mServerIp = "http://localhost:80";
   public ReceiveSmsService() {
   }
 
@@ -38,8 +37,8 @@ public class ReceiveSmsService extends Service {
       public void onReceive(Context context, Intent intent) {
         if ("android.provider.Telephony.SMS_RECEIVED".equals(intent.getAction())) {
           try {
-            String xmlData = buildJson(getSmsMessage(intent), getPhoneNumber());
-            //sendSmsMessageToServer(xmlData);
+            String jsonData = buildJson(getSmsMessage(intent), getPhoneNumber());
+            sendSmsMessageToServer(jsonData);
           } catch (Exception e) {
             Log.e("error", "fail to build json");
           }
@@ -48,7 +47,7 @@ public class ReceiveSmsService extends Service {
     }, intentFilter);
   }
   private void sendSmsMessageToServer(String xmlData) {
-    ServerWriteThread serverWriteThread = new ServerWriteThread(mServerIp, xmlData);
+    ServerWriteThread serverWriteThread = new ServerWriteThread(xmlData);
     serverWriteThread.start();
   }
   private String buildJson(SmsMessage smsMessage, String phoneNumber) throws Exception{
