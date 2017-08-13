@@ -3,9 +3,7 @@ package acoustically.pessenger;
 
 import android.util.Log;
 
-import java.io.BufferedWriter;
 import java.io.DataOutputStream;
-import java.io.OutputStreamWriter;
 import java.net.Socket;
 
 /**

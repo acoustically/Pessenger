@@ -52,6 +52,7 @@ public class ReceiveSmsService extends Service {
   }
   private String buildJson(SmsMessage smsMessage, String phoneNumber) throws Exception{
     JSONObject json = new JSONObject();
+    json.put("client", "android");
     json.put("sms-receiver-phone-number", phoneNumber);
     json.put("sms-sender-phone-number", smsMessage.getOriginatingAddress());
     json.put("sms-body", smsMessage.getMessageBody());
