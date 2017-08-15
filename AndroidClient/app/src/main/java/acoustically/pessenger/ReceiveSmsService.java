@@ -50,7 +50,8 @@ public class ReceiveSmsService extends Service {
   }
   private void sendSmsMessageToServer(String xmlData) {
     try {
-      ServerWriteThread serverWriteThread = new ServerWriteThread(SocketConnector.getSocket(), xmlData);
+      SocketConnector connector = new SocketConnector();
+      ServerWriteThread serverWriteThread = new ServerWriteThread(connector.getSocket(), xmlData);
       serverWriteThread.start();
     } catch (Exception e) {
       Log.e("error", "cannot send data to server");
@@ -59,6 +60,7 @@ public class ReceiveSmsService extends Service {
   private String buildJson(SmsMessage smsMessage, String phoneNumber) throws Exception{
     JSONObject json = new JSONObject();
     json.put("client", "android");
+    json.put("action", "receiveSmsMessage");
     json.put("myPhoneNumber", phoneNumber);
     json.put("smsSenderPhoneNumber", smsMessage.getOriginatingAddress());
     json.put("smsBody", smsMessage.getMessageBody());

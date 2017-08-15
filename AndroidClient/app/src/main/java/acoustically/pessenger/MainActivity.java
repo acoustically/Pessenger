@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.net.Socket;
 
 public class MainActivity extends AppCompatActivity {
@@ -27,7 +28,15 @@ public class MainActivity extends AppCompatActivity {
     setContentView(R.layout.activity_main);
     getPermission(Manifest.permission.RECEIVE_SMS);
     getPermission(Manifest.permission.READ_PHONE_STATE);
-    startService(new Intent(this, ReceiveSmsService.class));
+    try {
+      if(userValidation()) {
+        startService(new Intent(this, ReceiveSmsService.class));
+      } else {
+
+      }
+    } catch (Exception e) {
+
+    }
   }
   private void getPermission(String permission) {
     int receiveSmsPermission =
@@ -44,16 +53,19 @@ public class MainActivity extends AppCompatActivity {
     json.put("myPhoneNumber", phoneNumber);
     return json.toString();
   }
-  private boolean userValidation() {
+  private boolean userValidation() throws Exception{
     try {
-      Socket socket = SocketConnector.getSocket();
+      SocketConnector connector = new SocketConnector();
+      Socket socket = connector.getSocket();
       String json = makeAccoundJsonData();
       ServerWriteThread writer = new ServerWriteThread(socket, json);
       writer.start();
+      ServerReceiveThread receiver = new ServerReceiveThread(socket);
+      receiver.start();
       return true;
     } catch (Exception e) {
-      Log.e("error", "userValidation: connot send data to server");
-      return false;
+      Log.e("error", "userValidation: cannot send data to server");
+      throw new Exception();
     }
   }
 }
