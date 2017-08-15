@@ -11,8 +11,13 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.SmsMessage;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
+
+import org.json.JSONObject;
+
+import java.net.Socket;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -29,6 +34,26 @@ public class MainActivity extends AppCompatActivity {
       ContextCompat.checkSelfPermission(this, permission);
     if(receiveSmsPermission == PackageManager.PERMISSION_DENIED) {
       ActivityCompat.requestPermissions(this, new String[]{permission}, 0);
+    }
+  }
+  private String makeAccoundJsonData() throws Exception{
+    String phoneNumber = ((TelephonyManager)this.getSystemService(Context.TELEPHONY_SERVICE)).getLine1Number();
+    JSONObject json = new JSONObject();
+    json.put("client", "android");
+    json.put("action", "userValidation");
+    json.put("myPhoneNumber", phoneNumber);
+    return json.toString();
+  }
+  private boolean userValidation() {
+    try {
+      Socket socket = SocketConnector.getSocket();
+      String json = makeAccoundJsonData();
+      ServerWriteThread writer = new ServerWriteThread(socket, json);
+      writer.start();
+      return true;
+    } catch (Exception e) {
+      Log.e("error", "userValidation: connot send data to server");
+      return false;
     }
   }
 }

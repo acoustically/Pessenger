@@ -13,6 +13,8 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import org.json.JSONObject;
 
+import java.net.Socket;
+
 public class ReceiveSmsService extends Service {
   public ReceiveSmsService() {
   }
@@ -47,15 +49,19 @@ public class ReceiveSmsService extends Service {
     }, intentFilter);
   }
   private void sendSmsMessageToServer(String xmlData) {
-    ServerWriteThread serverWriteThread = new ServerWriteThread(xmlData);
-    serverWriteThread.start();
+    try {
+      ServerWriteThread serverWriteThread = new ServerWriteThread(SocketConnector.getSocket(), xmlData);
+      serverWriteThread.start();
+    } catch (Exception e) {
+      Log.e("error", "cannot send data to server");
+    }
   }
   private String buildJson(SmsMessage smsMessage, String phoneNumber) throws Exception{
     JSONObject json = new JSONObject();
     json.put("client", "android");
-    json.put("sms-receiver-phone-number", phoneNumber);
-    json.put("sms-sender-phone-number", smsMessage.getOriginatingAddress());
-    json.put("sms-body", smsMessage.getMessageBody());
+    json.put("myPhoneNumber", phoneNumber);
+    json.put("smsSenderPhoneNumber", smsMessage.getOriginatingAddress());
+    json.put("smsBody", smsMessage.getMessageBody());
     return json.toString();
   }
   private String getPhoneNumber() {
