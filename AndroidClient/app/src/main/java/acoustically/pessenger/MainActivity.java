@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -20,7 +22,19 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.net.Socket;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity{
+
+  class receiveThreadHandler extends Handler {
+    @Override
+    public void handleMessage(Message msg) {
+      super.handleMessage(msg);
+      if(msg.arg1 == 1) {
+        Log.e("error", "this phone number is not signed up");
+      }  else {
+        Log.e("success", "Log in Success");
+      }
+    }
+  }
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
     String phoneNumber = ((TelephonyManager)this.getSystemService(Context.TELEPHONY_SERVICE)).getLine1Number();
     JSONObject json = new JSONObject();
     json.put("client", "android");
-    json.put("action", "userValidation");
+    json.put("action", "logIn");
     json.put("myPhoneNumber", phoneNumber);
     return json.toString();
   }
@@ -60,11 +74,11 @@ public class MainActivity extends AppCompatActivity {
       String json = makeAccoundJsonData();
       ServerWriteThread writer = new ServerWriteThread(socket, json);
       writer.start();
-      ServerReceiveThread receiver = new ServerReceiveThread(socket);
+      ServerReceiveThread receiver = new ServerReceiveThread(socket, new receiveThreadHandler());
       receiver.start();
       return true;
     } catch (Exception e) {
-      Log.e("error", "userValidation: cannot send data to server");
+      Log.e("error", "Log In: cannot send data to server");
       throw new Exception();
     }
   }
