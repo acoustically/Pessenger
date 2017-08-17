@@ -26,15 +26,17 @@ public class ServerReceiveThread extends Thread {
   @Override
   public void run() {
     super.run();
+    Message message = Message.obtain();
     try {
       Log.e("error", "start to receiving data");
       String data = mReceiver.readLine();
       Log.e("success", "result : " + data);
-      Message message = Message.obtain();
       message.arg1 = Integer.parseInt(data);
-      mHandler.sendMessage(message);
     } catch (Exception e) {
+      message.arg1 = 2;
       Log.e("error", "fail to read data from socket");
+    } finally {
+      mHandler.sendMessage(message);
     }
   }
 }

@@ -1,85 +1,38 @@
 package acoustically.pessenger;
 
-import android.Manifest;
-import android.content.BroadcastReceiver;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.os.Handler;
-import android.os.Message;
+import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.telephony.SmsMessage;
 import android.telephony.TelephonyManager;
-import android.util.Log;
-import android.widget.Toast;
 
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.net.Socket;
-
-public class MainActivity extends AppCompatActivity{
-
-  class receiveThreadHandler extends Handler {
-    @Override
-    public void handleMessage(Message msg) {
-      super.handleMessage(msg);
-      if(msg.arg1 == 1) {
-        Log.e("error", "this phone number is not signed up");
-      }  else {
-        Log.e("success", "Log in Success");
-      }
-    }
-  }
+public class MainActivity extends AppCompatActivity {
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    getPermission(this, android.Manifest.permission.RECEIVE_SMS);
     setContentView(R.layout.activity_main);
-    getPermission(Manifest.permission.RECEIVE_SMS);
-    getPermission(Manifest.permission.READ_PHONE_STATE);
-    try {
-      if(userValidation()) {
-        startService(new Intent(this, ReceiveSmsService.class));
-      } else {
-
-      }
-    } catch (Exception e) {
-
-    }
+    startActivity(new Intent(this, ReceiveSmsService.class));
   }
-  private void getPermission(String permission) {
+  public static void navigateActivity(Activity activity, Class<?> cls) {
+    Intent intent = new Intent(activity, cls);
+    activity.startActivity(intent);
+    activity.finish();
+  }
+  public static void getPermission(Activity activity, String permission) {
     int receiveSmsPermission =
-      ContextCompat.checkSelfPermission(this, permission);
+      ContextCompat.checkSelfPermission(activity, permission);
     if(receiveSmsPermission == PackageManager.PERMISSION_DENIED) {
-      ActivityCompat.requestPermissions(this, new String[]{permission}, 0);
+      ActivityCompat.requestPermissions(activity, new String[]{permission}, 0);
     }
   }
-  private String makeAccoundJsonData() throws Exception{
-    String phoneNumber = ((TelephonyManager)this.getSystemService(Context.TELEPHONY_SERVICE)).getLine1Number();
-    JSONObject json = new JSONObject();
-    json.put("client", "android");
-    json.put("action", "logIn");
-    json.put("myPhoneNumber", phoneNumber);
-    return json.toString();
-  }
-  private boolean userValidation() throws Exception{
-    try {
-      SocketConnector connector = new SocketConnector();
-      Socket socket = connector.getSocket();
-      String json = makeAccoundJsonData();
-      ServerWriteThread writer = new ServerWriteThread(socket, json);
-      writer.start();
-      ServerReceiveThread receiver = new ServerReceiveThread(socket, new receiveThreadHandler());
-      receiver.start();
-      return true;
-    } catch (Exception e) {
-      Log.e("error", "Log In: cannot send data to server");
-      throw new Exception();
-    }
+  public static String getPhoneNumber(Context context) {
+    TelephonyManager telephonyManager = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
+    return telephonyManager.getLine1Number();
   }
 }

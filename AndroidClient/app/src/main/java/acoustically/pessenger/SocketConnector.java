@@ -11,7 +11,7 @@ import java.net.Socket;
 public class SocketConnector {
 
   class ConnectThread extends Thread {
-    SocketConnector mConnector;
+    private SocketConnector mConnector;
 
     public ConnectThread(SocketConnector mConnector) {
       this.mConnector = mConnector;
@@ -42,7 +42,7 @@ public class SocketConnector {
     }
   }
 
-  Socket mSocket;
+  private Socket mSocket;
 
   public Socket getSocket() throws Exception{
     Thread thread = new ConnectThread(this);
