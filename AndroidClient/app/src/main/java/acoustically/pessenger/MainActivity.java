@@ -15,7 +15,7 @@ public class MainActivity extends AppCompatActivity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    getPermission(this, android.Manifest.permission.RECEIVE_SMS);
+    Environment.setPermission(this, android.Manifest.permission.RECEIVE_SMS);
     setContentView(R.layout.activity_main);
     startActivity(new Intent(this, ReceiveSmsService.class));
   }
@@ -24,15 +24,6 @@ public class MainActivity extends AppCompatActivity {
     activity.startActivity(intent);
     activity.finish();
   }
-  public static void getPermission(Activity activity, String permission) {
-    int receiveSmsPermission =
-      ContextCompat.checkSelfPermission(activity, permission);
-    if(receiveSmsPermission == PackageManager.PERMISSION_DENIED) {
-      ActivityCompat.requestPermissions(activity, new String[]{permission}, 0);
-    }
-  }
-  public static String getPhoneNumber(Context context) {
-    TelephonyManager telephonyManager = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
-    return telephonyManager.getLine1Number();
-  }
+
+
 }
