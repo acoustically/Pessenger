@@ -12,7 +12,7 @@ import android.telephony.TelephonyManager;
  */
 
 public class Environment {
-  final static public String serverUrl = "Http://13.124.7.228";
+  final static public String serverUrl = "http://52.79.104.209:5000";
   static public String getUrl(String filename) {
     return serverUrl + filename;
   }

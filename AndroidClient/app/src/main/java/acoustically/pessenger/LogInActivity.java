@@ -30,10 +30,15 @@ public class LogInActivity extends AppCompatActivity {
   }
 
   private void logIn() {
+    Log.e("Error", "1");
     String phonenumber =  Environment.getPhoneNumber(this);
+    Log.e("Error", "2");
     HttpRequestorBuilder builder = new HttpRequestorBuilder(Environment.getUrl("/users/"+phonenumber));
+    Log.e("Error", "3");
     builder.addHeaders("Authorization", "Token acoustically");
+    Log.e("Error", "4");
     HttpRequestor requestor = builder.build();
+    Log.e("Error", "5");
     requestor.get(new HttpResponseListener() {
       @Override
       protected void httpResponse(String data) {

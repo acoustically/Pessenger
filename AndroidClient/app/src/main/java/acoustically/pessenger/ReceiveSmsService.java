@@ -38,7 +38,7 @@ public class ReceiveSmsService extends Service {
       public void onReceive(Context context, Intent intent) {
         if ("android.provider.Telephony.SMS_RECEIVED".equals(intent.getAction())) {
           try {
-            String jsonData = buildJson(getSmsMessage(intent), MainActivity.getPhoneNumber(context));
+            String jsonData = buildJson(getSmsMessage(intent), Environment.getPhoneNumber(context));
             sendSmsMessageToServer(jsonData);
           } catch (Exception e) {
             Log.e("error", "fail to build json");
@@ -48,13 +48,14 @@ public class ReceiveSmsService extends Service {
     }, intentFilter);
   }
   private void sendSmsMessageToServer(String xmlData) {
+    /*
     try {
       SocketConnector connector = new SocketConnector();
       ServerWriteThread serverWriteThread = new ServerWriteThread(connector.getSocket(), xmlData);
       serverWriteThread.start();
     } catch (Exception e) {
       Log.e("error", "cannot send data to server");
-    }
+    }*/
   }
   private String buildJson(SmsMessage smsMessage, String phoneNumber) throws Exception{
     JSONObject json = new JSONObject();
