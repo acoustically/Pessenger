@@ -95,7 +95,7 @@ public class ClientListFragment extends Fragment {
           for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject jsonObject = jsonArray.getJSONObject(i);
             String  clientName = jsonObject.getString("name");
-            int isPowerd = jsonObject.getInt("is_powered");
+            int isPowerd = jsonObject.getInt("is_connected");
             adapter.addItem(new ClientListItem(i, clientName, isPowerd));
           }
         } catch (JSONException e) {

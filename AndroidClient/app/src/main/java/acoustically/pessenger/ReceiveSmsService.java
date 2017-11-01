@@ -9,8 +9,12 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.telephony.SmsMessage;
 import android.util.Log;
+
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import AndroidHttpRequest.HttpRequestorBuilder;
+import AndroidHttpRequest.HttpResponseListener;
 import acoustically.pessenger.tools.Environment;
 
 public class ReceiveSmsService extends Service {
@@ -39,33 +43,35 @@ public class ReceiveSmsService extends Service {
       public void onReceive(Context context, Intent intent) {
         if ("android.provider.Telephony.SMS_RECEIVED".equals(intent.getAction())) {
           try {
-            String jsonData = buildJson(getSmsMessage(intent), Environment.getPhoneNumber(context));
-            sendSmsMessageToServer(jsonData);
+            JSONObject json = buildJson(getSmsMessage(intent), Environment.getPhoneNumber(context));
+            sendSmsMessageToServer(json);
           } catch (Exception e) {
-            Log.e("error", "fail to build json");
+            Log.e("Error", e.getMessage(), e.fillInStackTrace());
           }
         }
       }
     }, intentFilter);
   }
-  private void sendSmsMessageToServer(String xmlData) {
-    /*
-    try {
-      SocketConnector connector = new SocketConnector();
-      ServerWriteThread serverWriteThread = new ServerWriteThread(connector.getSocket(), xmlData);
-      serverWriteThread.start();
-    } catch (Exception e) {
-      Log.e("error", "cannot send data to server");
-    }*/
+  private void sendSmsMessageToServer(JSONObject json) throws JSONException {
+    HttpRequestorBuilder builder = new HttpRequestorBuilder(Environment.getUrl("/sms-message/new"));
+    builder.build().post(json, new HttpResponseListener() {
+      @Override
+      protected void httpResponse(String data) {
+
+      }
+
+      @Override
+      protected void httpExcepted(Exception e) {
+        Log.e("Error", e.getMessage(), e.fillInStackTrace());
+      }
+    });
   }
-  private String buildJson(SmsMessage smsMessage, String phoneNumber) throws Exception{
+  private JSONObject buildJson(SmsMessage smsMessage, String phoneNumber) throws Exception{
     JSONObject json = new JSONObject();
-    json.put("client", "android");
-    json.put("action", "receiveSmsMessage");
-    json.put("myPhoneNumber", phoneNumber);
-    json.put("smsSenderPhoneNumber", smsMessage.getOriginatingAddress());
-    json.put("smsBody", smsMessage.getMessageBody());
-    return json.toString();
+    json.put("phone_number", phoneNumber);
+    json.put("from_", smsMessage.getOriginatingAddress());
+    json.put("body", smsMessage.getMessageBody());
+    return json;
   }
 
   private SmsMessage getSmsMessage(Intent intent) {
