@@ -1,22 +1,21 @@
-package acoustically.pessenger;
+package acoustically.pessenger.sign;
 
 import android.Manifest;
 import android.app.Activity;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
-import org.apache.http.params.HttpParams;
 import org.json.JSONObject;
-
-import java.net.Socket;
 
 import AndroidHttpRequest.HttpRequestor;
 import AndroidHttpRequest.HttpRequestorBuilder;
 import AndroidHttpRequest.HttpResponseListener;
+import acoustically.pessenger.tools.ActivityNavigator;
+import acoustically.pessenger.tools.Environment;
+import acoustically.pessenger.MainActivity;
+import acoustically.pessenger.R;
 
 public class LogInActivity extends AppCompatActivity {
   Activity activity = this;
@@ -30,26 +29,24 @@ public class LogInActivity extends AppCompatActivity {
   }
 
   private void logIn() {
-    Log.e("Error", "1");
     String phonenumber =  Environment.getPhoneNumber(this);
-    Log.e("Error", "2");
-    HttpRequestorBuilder builder = new HttpRequestorBuilder(Environment.getUrl("/users/"+phonenumber));
-    Log.e("Error", "3");
+    HttpRequestorBuilder builder = new HttpRequestorBuilder(Environment.getUrl("/user/"+phonenumber));
     builder.addHeaders("Authorization", "Token acoustically");
-    Log.e("Error", "4");
     HttpRequestor requestor = builder.build();
-    Log.e("Error", "5");
     requestor.get(new HttpResponseListener() {
       @Override
       protected void httpResponse(String data) {
         try {
           JSONObject json = new JSONObject(data);
+          Log.e("Error", json.toString());
           if(json.get("response").equals("success")) {
             ActivityNavigator navigator = new ActivityNavigator(activity, MainActivity.class);
             navigator.navigate();
           } else {
-            ActivityNavigator navigator = new ActivityNavigator(activity, SignUpActivity.class);
-            navigator.navigate();
+            if(json.getJSONObject("error").getInt("errno") == 1602) {
+              ActivityNavigator navigator = new ActivityNavigator(activity, SignUpActivity.class);
+              navigator.navigate();
+            }
           }
         } catch (Exception e) {
           Log.e("Error", e.getMessage(), e.fillInStackTrace());
@@ -58,7 +55,7 @@ public class LogInActivity extends AppCompatActivity {
       @Override
       protected void httpExcepted(Exception e) {
         Log.e("Error", e.getMessage(), e.fillInStackTrace());
-        Toast.makeText(activity, "Server Error", Toast.LENGTH_LONG).show();
+        Toast.makeText(activity, e.getMessage(), Toast.LENGTH_LONG).show();
       }
     });
   }

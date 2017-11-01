@@ -8,9 +8,10 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.telephony.SmsMessage;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 import org.json.JSONObject;
+
+import acoustically.pessenger.tools.Environment;
 
 public class ReceiveSmsService extends Service {
   Context context = this;

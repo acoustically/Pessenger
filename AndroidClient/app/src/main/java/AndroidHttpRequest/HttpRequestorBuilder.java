@@ -1,5 +1,7 @@
 package AndroidHttpRequest;
 
+import android.util.Log;
+
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
@@ -16,6 +18,7 @@ public class HttpRequestorBuilder {
   public HttpRequestorBuilder(String mUrl) {
     this.mUrl = mUrl;
     mHeaders = new HashMap<>();
+    addHeaders("Authorization", "Token acoustically");
   }
 
   public HttpRequestorBuilder addParams(String key, String value) {

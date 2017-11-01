@@ -1,4 +1,4 @@
-package acoustically.pessenger;
+package acoustically.pessenger.tools;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -13,7 +13,7 @@ public class ActivityNavigator {
 
   public ActivityNavigator(Activity activity, Class class_) {
     this.activity = activity;
-    Intent intent = new Intent(activity, class_);
+    intent = new Intent(activity, class_);
   }
 
   public void setExtra(String key, String value) {

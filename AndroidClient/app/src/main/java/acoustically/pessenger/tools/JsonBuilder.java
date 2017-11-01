@@ -1,4 +1,4 @@
-package acoustically.pessenger;
+package acoustically.pessenger.tools;
 
 import android.util.Log;
 
@@ -9,7 +9,7 @@ import org.json.JSONObject;
  */
 
 public class JsonBuilder {
-  final static JSONObject buildJson(String data) {
+  public final static JSONObject buildJson(String data) {
     try {
       JSONObject jsonObject = new JSONObject(data);
       return jsonObject;
