@@ -1,6 +1,7 @@
 package acoustically.pessenger.sign;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,7 +15,6 @@ import org.json.JSONObject;
 import AndroidHttpRequest.HttpRequestor;
 import AndroidHttpRequest.HttpRequestorBuilder;
 import AndroidHttpRequest.HttpResponseListener;
-import acoustically.pessenger.tools.ActivityNavigator;
 import acoustically.pessenger.tools.Environment;
 import acoustically.pessenger.MainActivity;
 import acoustically.pessenger.R;
@@ -51,8 +51,8 @@ public class SignUpActivity extends AppCompatActivity {
           try {
             JSONObject json = new JSONObject(data);
             if(json.getString("response").equals("success")){
-              ActivityNavigator activityNavigator = new ActivityNavigator(activity, MainActivity.class);
-              activityNavigator.navigate();
+              activity.startActivity(new Intent(activity, MainActivity.class));
+              activity.finish();
             } else {
               Toast.makeText(activity, "Server Error", Toast.LENGTH_LONG).show();
             }

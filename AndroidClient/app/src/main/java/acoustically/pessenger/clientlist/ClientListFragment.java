@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -76,6 +77,11 @@ public class ClientListFragment extends Fragment {
   @Override
   public void onResume() {
     super.onResume();
+    setListView();
+
+  }
+
+  private void setListView() {
     HttpRequestorBuilder builder = new HttpRequestorBuilder(Environment.getUrl("/client/"+ Environment.getPhoneNumber(getActivity())));
     builder.build().get(new HttpResponseListener() {
       @Override
@@ -100,7 +106,8 @@ public class ClientListFragment extends Fragment {
 
       @Override
       protected void httpExcepted(Exception e) {
-
+        Log.e("Error", e.getMessage(), e.fillInStackTrace());
+        Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_LONG).show();
       }
     });
   }

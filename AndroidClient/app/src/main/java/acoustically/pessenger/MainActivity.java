@@ -3,6 +3,7 @@ package acoustically.pessenger;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -20,7 +21,7 @@ public class MainActivity extends Activity implements ClientListFragment.OnFragm
     transaction.add(R.id.main_activity_frame_layout, new ClientListFragment());
     transaction.commit();
 
-    //startService(new Intent(this, ReceiveSmsService.class));
+    startService(new Intent(this, ReceiveSmsService.class));
   }
 
   @Override

@@ -2,6 +2,7 @@ package acoustically.pessenger.sign;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,7 +13,6 @@ import org.json.JSONObject;
 import AndroidHttpRequest.HttpRequestor;
 import AndroidHttpRequest.HttpRequestorBuilder;
 import AndroidHttpRequest.HttpResponseListener;
-import acoustically.pessenger.tools.ActivityNavigator;
 import acoustically.pessenger.tools.Environment;
 import acoustically.pessenger.MainActivity;
 import acoustically.pessenger.R;
@@ -40,12 +40,12 @@ public class LogInActivity extends AppCompatActivity {
           JSONObject json = new JSONObject(data);
           Log.e("Error", json.toString());
           if(json.get("response").equals("success")) {
-            ActivityNavigator navigator = new ActivityNavigator(activity, MainActivity.class);
-            navigator.navigate();
+            activity.startActivity(new Intent(activity, MainActivity.class));
+            activity.finish();
           } else {
             if(json.getJSONObject("error").getInt("errno") == 1602) {
-              ActivityNavigator navigator = new ActivityNavigator(activity, SignUpActivity.class);
-              navigator.navigate();
+              activity.startActivity(new Intent(activity, SignUpActivity.class));
+              activity.finish();
             }
           }
         } catch (Exception e) {
